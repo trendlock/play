@@ -1,0 +1,107 @@
+---
+title: "Interactive Plots"
+author: "Ross"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    toc: true
+    toc_depth: 3
+    toc_float: true
+    number_sections: true
+    self_contained: yes
+    css: css/YSIcss.css
+    highlight: pygments
+---
+  
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+
+```
+
+<div style="position: fixed; top: 0; right: 0;">
+  ![](imgs/YSI.png)
+</div>
+
+
+# Plotly
+
+My general recomendation is `plotly`. 
+
+- Open source (with pretty active community) 
+- Has own syntax for precise handling, but _can take a `ggplot` object and automatically convert it_.
+- Nice feel and user expereince
+
+```{r, message=F, warning=F}
+library(plotly)
+
+p <- ggplot(mtcars, aes(mpg, disp, col = as.factor(gear))) +
+  geom_point()
+
+ggplotly(p)
+
+```
+
+
+
+# Highcharts (Highcharter)
+
+We use this on for [Trendlocks Forecast - Bat Country](https://trendlock.shinyapps.io/batcountry/), but its a new 
+
+```{r, message=F, warning=F}
+suppressPackageStartupMessages(library(highcharter))
+
+highchart() %>% 
+  hc_chart(type = "line") %>% 
+  hc_title(text = "Monthly Average Temperature") %>% 
+  hc_subtitle(text = "Source: WorldClimate.com") %>% 
+  hc_xAxis(categories = c("Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                          "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")) %>% 
+  hc_yAxis(title = list(text = "Temperature (C)")) %>% 
+  hc_plotOptions(line = list(
+    dataLabels = list(enabled = TRUE),
+    enableMouseTracking = T)
+  ) %>% 
+  hc_series(
+    list(
+      name = "Tokyo",
+      data = c(7.0, 6.9, 9.5, 14.5, 18.4, 21.5, 25.2, 26.5, 23.3, 18.3, 13.9, 9.6)
+    ),
+    list(
+      name = "London",
+      data = c(3.9, 4.2, 5.7, 8.5, 11.9, 15.2, 17.0, 16.6, 14.2, 10.3, 6.6, 4.8)
+    )
+  )
+
+
+
+```
+
+
+
+
+# r2d3 (D3.js)
+
+This method ports a Javascript library to R. It's light, interactive and has some crazy plotting types but it's still in an experimental stage, so probably not stable enought to use...
+
+```{r, warning=F, message=F}
+library(r2d3)
+
+r2d3(d3_version = 4, script = "js/voronoi.js")
+
+```
+
+
+# Static and interactive
+
+What if we could have a static and interactive plot side by side? Maybe a simple soloution is to have two idential plots side by side so that even when you zoom in on one, the other is there for reference. Depends on your intended use I guess. 
+
+
+```{r, fig.width=10}
+
+p1 <- plot_ly(economics, x = ~date, y = ~unemploy) %>%
+  add_lines(color = "red")
+subplot(p1, p1)
+```
+
