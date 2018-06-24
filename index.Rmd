@@ -56,7 +56,7 @@ ggplotly(p)
 
 ```
 
-## Facetting
+## H and V lines
 
 ```{r, message=F, warning=F}
 
